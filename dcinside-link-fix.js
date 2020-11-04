@@ -10,34 +10,24 @@
 // @run-at		document-end
 // ==/UserScript==
 
-(function() {
+(function () {
     "use strict";
 
     const regex = /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
 
-    for (const query of document.querySelectorAll(".writing_view_box div")) {
-        const children = query.children;
+    document.querySelectorAll(".writing_view_box p").forEach(query => {
+        if (!query.textContent)
+            return;
 
-        for (let i = 0; i < children.length; i++) {
-            const children2 = children[i].children;
+        for (const string of query.textContent.split(' ')) {
+            const exec = regex.exec(string);
 
-            for (let j = 0; j < children2.length; j++) {
-                if (children2[j].tagName === "A")
-                    continue;
+            if (!exec)
+                return;
 
-                const textSplit = children2[j].textContent.split(' ');
+            const text = exec[0];
 
-                for (const string of textSplit) {
-                    const exec = regex.exec(string);
-
-                    if (!exec)
-                        continue;
-
-                    const text = exec[0];
-
-                    children2[j].innerHTML = children2[j].innerHTML.replace(text, `<a class="__hoverBox_aLink" href="${string}">${string}</a>`);
-                }
-            }
+            query.innerHTML = query.innerHTML.replace(text, `<a class="__hoverBox_aLink" href="${text}">${text}</a>`);
         }
-    }
+    });
 })();
